@@ -44,12 +44,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inputFile: iris
-  plotScale: 10
+  plotScale: 0.2
   columnX: 0
   columnY: 1
   columnZ: 2
   xName: 
   yName: 
   zName: 
-  pointPrefab: {fileID: 0}
-  pointHolder: {fileID: 0}
+  numParts: 5
+  pointPrefab: {fileID: 7581758562633827776, guid: cf226f4d711b9d4499d0fa07ed815627, type: 3}
+  pointHolder: {fileID: 8120669379581187153}
+  axis: {fileID: 5444968462155564802, guid: 333f04b5eb69aa246b9a8ba50d166129, type: 3}
+  sampleText: {fileID: 0}
+  axisNameText: []
+  axisColor:
+  - {r: 1, g: 0, b: 0, a: 1}
+  - {r: 0.010022163, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  Camera: {fileID: 0}

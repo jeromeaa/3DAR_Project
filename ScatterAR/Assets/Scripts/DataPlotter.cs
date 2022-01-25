@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using TMPro;
+using UnityEngine.UI;
 
 public class DataPlotter : MonoBehaviour
 {
@@ -23,11 +25,32 @@ public class DataPlotter : MonoBehaviour
     public string yName;
     public string zName;
 
+    // Number of separation on axis
+    public int numParts=5;
+
     // The prefab for the data points that will be instantiated
     public GameObject pointPrefab;
 
     // Object which will contain instantiated prefabs in hiearchy
     public GameObject pointHolder;
+
+    // The Object of the axis
+    public GameObject axis;
+
+    // Text object
+    public TextMeshPro sampleText;
+
+    // Axis text
+    public TextMeshProUGUI[] axisNameText;
+
+    // Axis color
+    public Color[] axisColor;
+
+    // The Camera
+    public GameObject Camera;
+
+    // The 3 axis
+    GameObject[] xyzaxis = new GameObject[3];
 
     // Use this for initialization
     void Start()
@@ -52,16 +75,19 @@ public class DataPlotter : MonoBehaviour
         xName = columnList[columnX];
         yName = columnList[columnY];
         zName = columnList[columnZ];
+        string[] mName = { xName, yName, zName };
 
         // Get maxes of each axis
         float xMax = FindMaxValue(xName);
         float yMax = FindMaxValue(yName);
         float zMax = FindMaxValue(zName);
+        float[] mMax = { xMax, yMax, zMax };
 
         // Get minimums of each axis
         float xMin = FindMinValue(xName);
         float yMin = FindMinValue(yName);
         float zMin = FindMinValue(zName);
+        float[] mMin = { xMin, yMin, zMin };
 
         //Loop through Pointlist
         for (var i = 0; i < pointList.Count; i++)
@@ -100,6 +126,42 @@ public class DataPlotter : MonoBehaviour
             // Gets material color and sets it to a new RGBA color we define
             dataPoint.GetComponent<Renderer>().material.color =
             new Color(x, y, z, 1.0f);
+        }
+
+        // Draw the axis
+        for (int i = 0; i < 3; i++)
+        {
+            Vector3 pos = Vector3.zero;
+            pos[i] = plotScale * 1.1f / 2;
+
+            Vector3 sc = 0.001f * Vector3.one;
+            sc[i] = plotScale * 1.1f;
+
+            xyzaxis[i] = Instantiate(axis, pos, Quaternion.identity);
+            xyzaxis[i].transform.localScale = sc;
+            xyzaxis[i].transform.parent = pointHolder.transform;
+            xyzaxis[i].transform.name = mName[i];
+            xyzaxis[i].GetComponent<Renderer>().material.color = axisColor[i];
+            
+            axisNameText[i].text = mName[i];
+            axisNameText[i].color = axisColor[i];
+
+            // Intermedial values
+            float pSize = (mMax[i] - mMin[i])/numParts;
+            for (int j = 1; j < numParts+1; j++)
+            {
+                Vector3 posP = Vector3.zero;
+                posP[i] = (plotScale / numParts) * j;
+                GameObject pt = Instantiate(axis, posP, Quaternion.identity);
+                pt.transform.localScale = 0.002f * Vector3.one;
+                pt.transform.parent = pointHolder.transform;
+                pt.GetComponent<Renderer>().material.color = axisColor[i];
+
+                TextMeshPro txt = Instantiate(sampleText, posP, Quaternion.identity);
+                txt.text = (pSize * j).ToString();
+                txt.transform.localScale = 0.002f * Vector3.one;
+                txt.transform.parent = pointHolder.transform;
+            }
         }
     }
 
