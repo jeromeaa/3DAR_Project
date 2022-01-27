@@ -34,6 +34,10 @@ public class DataPlotter : MonoBehaviour
     // Object which will contain instantiated prefabs in hiearchy
     public GameObject pointHolder;
 
+    //
+    public GameObject fixedHolder;
+    public GameObject[] axisHolder;
+
     // The Object of the axis
     public GameObject axis;
 
@@ -52,10 +56,20 @@ public class DataPlotter : MonoBehaviour
     // The 3 axis
     GameObject[] xyzaxis = new GameObject[3];
 
+    // Max and Min values x,y,z
+    float[] mMax = new float[3];
+    float[] mMin = new float[3];
+
+    float initialDistance;
+    Vector3 initialScale;
+    Vector3 initialPtScale;
+
+    int selectedAxis = -1;
+
     // Use this for initialization
     void Start()
     {
-
+        selectedAxis = 1;
         // Set pointlist to results of function Reader with argument inputfile
         pointList = CSVReader.Read(inputFile);
 
@@ -78,29 +92,27 @@ public class DataPlotter : MonoBehaviour
         string[] mName = { xName, yName, zName };
 
         // Get maxes of each axis
-        float xMax = FindMaxValue(xName);
-        float yMax = FindMaxValue(yName);
-        float zMax = FindMaxValue(zName);
-        float[] mMax = { xMax, yMax, zMax };
+        mMax[0] = FindMaxValue(xName);
+        mMax[1] = FindMaxValue(yName);
+        mMax[2] = FindMaxValue(zName);
 
         // Get minimums of each axis
-        float xMin = FindMinValue(xName);
-        float yMin = FindMinValue(yName);
-        float zMin = FindMinValue(zName);
-        float[] mMin = { xMin, yMin, zMin };
+        mMin[0] = FindMinValue(xName);
+        mMin[1] = FindMinValue(yName);
+        mMin[2] = FindMinValue(zName);
 
         //Loop through Pointlist
         for (var i = 0; i < pointList.Count; i++)
         {
             // Get value in poinList at ith "row", in "column" Name, normalize
             float x =
-            (System.Convert.ToSingle(pointList[i][xName]) - xMin) / (xMax - xMin);
+            (System.Convert.ToSingle(pointList[i][xName]) - mMin[0]) / (mMax[0] - mMin[0]);
 
             float y =
-            (System.Convert.ToSingle(pointList[i][yName]) - yMin) / (yMax - yMin);
+            (System.Convert.ToSingle(pointList[i][yName]) - mMin[1]) / (mMax[1] - mMin[1]);
 
             float z =
-            (System.Convert.ToSingle(pointList[i][zName]) - zMin) / (zMax - zMin);
+            (System.Convert.ToSingle(pointList[i][zName]) - mMin[2]) / (mMax[2] - mMin[2]);
 
             //instantiate the prefab with coordinates defined above
             //Instantiate(pointPrefab, new Vector3(x, y, z), Quaternion.identity);
@@ -133,13 +145,15 @@ public class DataPlotter : MonoBehaviour
         {
             Vector3 pos = Vector3.zero;
             pos[i] = plotScale * 1.1f / 2;
+            Debug.Log("Position");
+            Debug.Log(pos);
 
             Vector3 sc = 0.001f * Vector3.one;
             sc[i] = plotScale * 1.1f;
 
             xyzaxis[i] = Instantiate(axis, pos, Quaternion.identity);
+            xyzaxis[i].transform.parent = fixedHolder.transform;
             xyzaxis[i].transform.localScale = sc;
-            xyzaxis[i].transform.parent = pointHolder.transform;
             xyzaxis[i].transform.name = mName[i];
             xyzaxis[i].GetComponent<Renderer>().material.color = axisColor[i];
             
@@ -154,15 +168,64 @@ public class DataPlotter : MonoBehaviour
                 posP[i] = (plotScale / numParts) * j;
                 GameObject pt = Instantiate(axis, posP, Quaternion.identity);
                 pt.transform.localScale = 0.002f * Vector3.one;
-                pt.transform.parent = pointHolder.transform;
+                pt.transform.parent = axisHolder[i].transform;
                 pt.GetComponent<Renderer>().material.color = axisColor[i];
 
                 TextMeshPro txt = Instantiate(sampleText, posP, Quaternion.identity);
                 txt.text = (pSize * j).ToString();
                 txt.transform.localScale = 0.002f * Vector3.one;
-                txt.transform.parent = pointHolder.transform;
+                txt.transform.parent = axisHolder[i].transform;
             }
         }
+    }
+
+    void Update()
+    {
+        // Scale
+        if (Input.touchCount == 2 && selectedAxis>-1 && selectedAxis <3)
+        {
+
+            var touchZero = Input.GetTouch(0);
+            var touchOne = Input.GetTouch(1);
+
+            if (touchZero.phase == TouchPhase.Ended || touchZero.phase == TouchPhase.Canceled ||
+                touchOne.phase == TouchPhase.Ended || touchOne.phase == TouchPhase.Canceled)
+            {
+                return;
+            }
+
+            if (touchZero.phase == TouchPhase.Began || touchOne.phase == TouchPhase.Began)
+            {
+                initialDistance = Vector2.Distance(touchZero.position, touchOne.position);
+                initialScale = pointHolder.transform.localScale;
+                initialPtScale = pointHolder.transform.GetChild(0).transform.localScale;
+                Debug.Log("Initial distance: " + initialDistance + "GameObject name: " + gameObject.name);
+            }
+            else
+            {
+                var currentDistance = Vector2.Distance(touchZero.position, touchOne.position);
+
+                if (Mathf.Approximately(initialDistance, 0))
+                {
+                    return;
+                }
+
+                var factor = currentDistance / initialDistance;
+                // Change the the code below to scale the right thing
+                var scaled = initialScale;
+                scaled[selectedAxis] *= factor;
+                pointHolder.transform.localScale = scaled;
+
+                foreach (Transform child in pointHolder.transform)
+                {
+                    var val = initialPtScale;
+                    val[selectedAxis] /= factor;
+                    child.transform.localScale = val;
+                }
+            }
+
+        }
+
     }
 
     private float FindMaxValue(string columnName)
