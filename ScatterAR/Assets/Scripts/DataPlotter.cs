@@ -48,7 +48,7 @@ public class DataPlotter : MonoBehaviour
     public TextMeshProUGUI[] axisNameText;
 
     // Axis color
-    public Color[] axisColor;
+    public Material[] axisMaterials;
 
     // The Camera
     public GameObject Camera;
@@ -59,17 +59,10 @@ public class DataPlotter : MonoBehaviour
     // Max and Min values x,y,z
     float[] mMax = new float[3];
     float[] mMin = new float[3];
-
-    float initialDistance;
-    Vector3 initialScale;
-    Vector3 initialPtScale;
-
-    int selectedAxis = -1;
-
+    
     // Use this for initialization
     void Start()
     {
-        selectedAxis = 1;
         // Set pointlist to results of function Reader with argument inputfile
         pointList = CSVReader.Read(inputFile);
 
@@ -148,17 +141,17 @@ public class DataPlotter : MonoBehaviour
             Debug.Log("Position");
             Debug.Log(pos);
 
-            Vector3 sc = 0.001f * Vector3.one;
+            Vector3 sc = 0.002f * Vector3.one;
             sc[i] = plotScale * 1.1f;
 
             xyzaxis[i] = Instantiate(axis, pos, Quaternion.identity);
             xyzaxis[i].transform.parent = fixedHolder.transform;
             xyzaxis[i].transform.localScale = sc;
             xyzaxis[i].transform.name = mName[i];
-            xyzaxis[i].GetComponent<Renderer>().material.color = axisColor[i];
+            xyzaxis[i].GetComponent<Renderer>().material= axisMaterials[i];
             
             axisNameText[i].text = mName[i];
-            axisNameText[i].color = axisColor[i];
+            axisNameText[i].color = axisMaterials[i].color;
 
             // Intermedial values
             float pSize = (mMax[i] - mMin[i])/numParts;
@@ -167,65 +160,16 @@ public class DataPlotter : MonoBehaviour
                 Vector3 posP = Vector3.zero;
                 posP[i] = (plotScale / numParts) * j;
                 GameObject pt = Instantiate(axis, posP, Quaternion.identity);
-                pt.transform.localScale = 0.002f * Vector3.one;
+                pt.transform.localScale = 0.004f * Vector3.one;
                 pt.transform.parent = axisHolder[i].transform;
-                pt.GetComponent<Renderer>().material.color = axisColor[i];
+                pt.GetComponent<Renderer>().material = axisMaterials[i];
 
                 TextMeshPro txt = Instantiate(sampleText, posP, Quaternion.identity);
                 txt.text = (pSize * j).ToString();
-                txt.transform.localScale = 0.002f * Vector3.one;
+                txt.transform.localScale = 0.004f * Vector3.one;
                 txt.transform.parent = axisHolder[i].transform;
             }
         }
-    }
-
-    void Update()
-    {
-        // Scale
-        if (Input.touchCount == 2 && selectedAxis>-1 && selectedAxis <3)
-        {
-
-            var touchZero = Input.GetTouch(0);
-            var touchOne = Input.GetTouch(1);
-
-            if (touchZero.phase == TouchPhase.Ended || touchZero.phase == TouchPhase.Canceled ||
-                touchOne.phase == TouchPhase.Ended || touchOne.phase == TouchPhase.Canceled)
-            {
-                return;
-            }
-
-            if (touchZero.phase == TouchPhase.Began || touchOne.phase == TouchPhase.Began)
-            {
-                initialDistance = Vector2.Distance(touchZero.position, touchOne.position);
-                initialScale = pointHolder.transform.localScale;
-                initialPtScale = pointHolder.transform.GetChild(0).transform.localScale;
-                Debug.Log("Initial distance: " + initialDistance + "GameObject name: " + gameObject.name);
-            }
-            else
-            {
-                var currentDistance = Vector2.Distance(touchZero.position, touchOne.position);
-
-                if (Mathf.Approximately(initialDistance, 0))
-                {
-                    return;
-                }
-
-                var factor = currentDistance / initialDistance;
-                // Change the the code below to scale the right thing
-                var scaled = initialScale;
-                scaled[selectedAxis] *= factor;
-                pointHolder.transform.localScale = scaled;
-
-                foreach (Transform child in pointHolder.transform)
-                {
-                    var val = initialPtScale;
-                    val[selectedAxis] /= factor;
-                    child.transform.localScale = val;
-                }
-            }
-
-        }
-
     }
 
     private float FindMaxValue(string columnName)
