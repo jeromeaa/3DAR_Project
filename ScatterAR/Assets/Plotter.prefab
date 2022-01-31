@@ -215,7 +215,6 @@ GameObject:
   m_Component:
   - component: {fileID: 8120669379581187159}
   - component: {fileID: 8120669379581187152}
-  - component: {fileID: 8424708304566808448}
   m_Layer: 0
   m_Name: Plotter
   m_TagString: Untagged
@@ -274,30 +273,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  axisColor:
-  - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 0, g: 1, b: 0, a: 1}
-  - {r: 0, g: 0, b: 1, a: 1}
   axisMaterials:
   - {fileID: 2100000, guid: adaa5da2f61084e48a81d8adcbca3eb7, type: 2}
   - {fileID: 2100000, guid: 2b9e25d2a14fa8141bb1e9de5c925606, type: 2}
   - {fileID: 2100000, guid: 0155bb913e6674346b76b98ddcf99518, type: 2}
   Camera: {fileID: 0}
---- !u!114 &8424708304566808448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8120669379581187153}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9c1decc93036835499c3edd7f068031b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Axis: []
-  Buttons: []
-  Vb: []
 --- !u!1 &8702714781894828200
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,9 @@ TagManager:
   - Scale3
   - Scale4
   - Scale5
+  - X
+  - Y
+  - Z
   layers:
   - Default
   - TransparentFX

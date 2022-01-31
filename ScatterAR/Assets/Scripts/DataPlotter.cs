@@ -62,7 +62,9 @@ public class DataPlotter : MonoBehaviour
     float[] mMin = new float[3];
 
     int[] prevScale = new int[3] { 1, 1, 1 };
-    
+
+    string[] tagList = { "X", "Y", "Z" };
+
     // Use this for initialization
     void Start()
     {
@@ -149,11 +151,16 @@ public class DataPlotter : MonoBehaviour
             Vector3 sc = 0.002f * Vector3.one;
             sc[i] = plotScale * 1.1f;
 
+            Vector3 colliderScale = 3 * Vector3.one;
+            colliderScale[i] = 1;
+
             xyzaxis[i] = Instantiate(axis, pos, Quaternion.identity);
             xyzaxis[i].transform.parent = fixedHolder.transform;
             xyzaxis[i].transform.localScale = sc;
             xyzaxis[i].transform.name = mName[i];
             xyzaxis[i].GetComponent<Renderer>().material= axisMaterials[i];
+            xyzaxis[i].GetComponent<BoxCollider>().size = colliderScale;
+            xyzaxis[i].tag = tagList[i];
             
             axisNameText[i].text = mName[i];
             axisNameText[i].color = axisMaterials[i].color;
