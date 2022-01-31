@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 public class DataPlotter : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class DataPlotter : MonoBehaviour
     public string zName;
 
     // Number of separation on axis
-    public int numParts=5;
+    public int numParts=4;
 
     // The prefab for the data points that will be instantiated
     public GameObject pointPrefab;
@@ -59,6 +60,8 @@ public class DataPlotter : MonoBehaviour
     // Max and Min values x,y,z
     float[] mMax = new float[3];
     float[] mMin = new float[3];
+
+    int[] prevScale = new int[3] { 1, 1, 1 };
     
     // Use this for initialization
     void Start()
@@ -93,6 +96,10 @@ public class DataPlotter : MonoBehaviour
         mMin[0] = FindMinValue(xName);
         mMin[1] = FindMinValue(yName);
         mMin[2] = FindMinValue(zName);
+
+        //prevScale = new int[]{ 1,1,1};
+
+        pointHolder.transform.position = (plotScale / 2) * Vector3.one;
 
         //Loop through Pointlist
         for (var i = 0; i < pointList.Count; i++)
@@ -138,8 +145,6 @@ public class DataPlotter : MonoBehaviour
         {
             Vector3 pos = Vector3.zero;
             pos[i] = plotScale * 1.1f / 2;
-            Debug.Log("Position");
-            Debug.Log(pos);
 
             Vector3 sc = 0.002f * Vector3.one;
             sc[i] = plotScale * 1.1f;
@@ -153,25 +158,98 @@ public class DataPlotter : MonoBehaviour
             axisNameText[i].text = mName[i];
             axisNameText[i].color = axisMaterials[i].color;
 
+            Vector3 holderPos = Vector3.zero;
+            holderPos[i] = plotScale / 2;
+            axisHolder[i].transform.position = holderPos;
+
             // Intermedial values
             float pSize = (mMax[i] - mMin[i])/numParts;
-            for (int j = 1; j < numParts+1; j++)
+            for (int j = 0; j < numParts+1; j++)
             {
                 Vector3 posP = Vector3.zero;
                 posP[i] = (plotScale / numParts) * j;
                 GameObject pt = Instantiate(axis, posP, Quaternion.identity);
                 pt.transform.localScale = 0.004f * Vector3.one;
                 pt.transform.parent = axisHolder[i].transform;
+                pt.transform.name = (pSize * j).ToString();
+                pt.tag = "Scale1";
                 pt.GetComponent<Renderer>().material = axisMaterials[i];
 
                 TextMeshPro txt = Instantiate(sampleText, posP, Quaternion.identity);
                 txt.text = (pSize * j).ToString();
                 txt.transform.localScale = 0.004f * Vector3.one;
-                txt.transform.parent = axisHolder[i].transform;
+                txt.transform.parent = pt.transform;
             }
         }
     }
 
+    private void FixedUpdate()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            if(axisHolder[i].transform.localScale[i]/(Math.Pow(2,prevScale[i])) >= 1)
+            {
+                prevScale[i]++;
+                List<Transform> childList = new List<Transform>();
+                for (int j = 0; j < axisHolder[i].transform.childCount; j++)
+                {
+                    childList.Add(axisHolder[i].transform.GetChild(j));
+                }
+
+                childList = childList.OrderBy(e => e.localPosition[i]).ToList();
+
+                for (int j = 0; j <childList.Count-1; j++)
+                {
+                    Vector3 posP = Vector3.zero;
+                    posP[i] = (childList[j].localPosition[i] + childList[j+1].localPosition[i]) / 2;
+
+                    float n1 = float.Parse(childList[j].name, System.Globalization.CultureInfo.InvariantCulture);
+                    float n2 = float.Parse(childList[j+1].name, System.Globalization.CultureInfo.InvariantCulture);
+                    float val = (n1 + n2) / 2;
+
+                    GameObject pt = Instantiate(axis);
+                    pt.transform.parent = axisHolder[i].transform;
+                    pt.transform.localPosition = posP;
+                    pt.transform.localRotation = Quaternion.identity;
+                    pt.transform.localScale = childList[j].localScale;
+                    pt.transform.name = val.ToString();
+                    pt.tag = "Scale" + prevScale[i].ToString();
+                    pt.GetComponent<Renderer>().material = axisMaterials[i];
+
+                    TextMeshPro txt = Instantiate(sampleText);
+                    txt.transform.parent = pt.transform;
+                    txt.transform.localPosition = Vector3.zero;
+                    txt.transform.localRotation = Quaternion.identity;
+                    txt.transform.localScale = Vector3.one;
+                    txt.text = val.ToString();
+                }
+
+                numParts *= 2;
+
+            }
+
+            if (axisHolder[i].transform.localScale[i] / (Math.Pow(2, prevScale[i]-1)) < 1 && prevScale[i] > 1)
+            {
+                prevScale[i]--;
+                // Remove points
+                List<Transform> childList = new List<Transform>();
+                for (int j = 0; j < axisHolder[i].transform.childCount; j++)
+                {
+                    childList.Add(axisHolder[i].transform.GetChild(j));
+                }
+
+                for (int j = 0; j < childList.Count; j++)
+                {
+                    if (childList[j].tag == "Scale" + (prevScale[i] + 1).ToString())
+                    {
+                        Destroy(childList[j].gameObject);
+                    }
+                }
+                
+                numParts /= 2;
+            }
+        }
+    }
     private float FindMaxValue(string columnName)
     {
         //set initial value to first value

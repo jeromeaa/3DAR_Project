@@ -43,7 +43,7 @@ public class PinchToScale : MonoBehaviour
                 // Change the the code below to scale the right thing
                 var scaled = initialScale;
                 scaled[SelectAxis.selectedAxis] *= factor;
-                if (scaled[SelectAxis.selectedAxis] > 1)
+                if (scaled[SelectAxis.selectedAxis] > 1 && scaled[SelectAxis.selectedAxis]<=16)
                 {
                     this.transform.localScale = scaled;
 
