@@ -8,11 +8,11 @@ using System;
 
 public class SelectAxis : MonoBehaviour
 {
-    public GameObject[] Axis;
+    public GameObject[] AxisPoints;
+    public GameObject fixedAxis;
+    GameObject[] Axis = new GameObject[3];
     public Material[] mat;
     public TextMeshProUGUI crosshair;
-
-    public TextMeshProUGUI textExample;
 
     public static int selectedAxis = 3;
 
@@ -24,7 +24,13 @@ public class SelectAxis : MonoBehaviour
     void Start()
     {
         rayCastBtn.onClick.AddListener(ShootRay);
+        for (int i = 0; i < 3; i++)
+        {
+            Axis[i] = fixedAxis.transform.GetChild(i).gameObject;
+        }
+
     }
+
 
 
     public void ChangeAxis(int a)
@@ -33,13 +39,16 @@ public class SelectAxis : MonoBehaviour
         {
             if (selectedAxis != 3)
             {
-                Axis[selectedAxis].GetComponent<PinchToScale>().enabled = false;
+                AxisPoints[selectedAxis].GetComponent<PinchToScale>().enabled = false;
+                Axis[selectedAxis].GetComponent<Outline>().enabled = false;
+
                 mat[selectedAxis].color = savedColor;
             }
 
             if (a != 3)
             {
-                Axis[a].GetComponent<PinchToScale>().enabled = true;
+                AxisPoints[a].GetComponent<PinchToScale>().enabled = true;
+                Axis[a].GetComponent<Outline>().enabled = true;
                 savedColor = mat[a].color;
                 mat[a].color = mat[3].color;
             }
@@ -50,14 +59,13 @@ public class SelectAxis : MonoBehaviour
 
     private void ShootRay()
     {
-        Debug.Log("SHOOOOOT");
         Ray ray = Camera.main.ScreenPointToRay(crosshair.transform.position);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity,~LayerMask.GetMask("Limiter")))
         {
             var tag = hit.transform.gameObject.tag;
-            textExample.text = tag;
+            Debug.Log(tag);
 
             var val = Array.IndexOf(tagList, tag);
             Debug.Log(val);

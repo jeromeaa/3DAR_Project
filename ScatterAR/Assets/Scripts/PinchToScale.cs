@@ -4,11 +4,22 @@ using UnityEngine;
 
 public class PinchToScale : MonoBehaviour
 {
+    // Pinch to Scale
     float initialDistance;
     Vector3 initialScale;
     Vector3 initialPtScale;
 
+    // Slide to move
+    Vector2 initialPosition;
+    float totalDistance = 0;
+
+    GameObject childMover;
     // Update is called once per frame
+
+    private void Start()
+    {
+        childMover = transform.GetChild(0).gameObject;
+    }
     void Update()
     {
         // Scale
@@ -28,7 +39,7 @@ public class PinchToScale : MonoBehaviour
             {
                 initialDistance = Vector2.Distance(touchZero.position, touchOne.position);
                 initialScale = this.transform.localScale;
-                initialPtScale = this.transform.GetChild(0).transform.localScale;
+                initialPtScale = childMover.transform.GetChild(0).transform.localScale;
             }
             else
             {
@@ -47,7 +58,7 @@ public class PinchToScale : MonoBehaviour
                 {
                     this.transform.localScale = scaled;
 
-                    foreach (Transform child in this.transform)
+                    foreach (Transform child in childMover.transform)
                     {
                         var val = initialPtScale;
                         val[SelectAxis.selectedAxis] /= factor;
@@ -58,5 +69,28 @@ public class PinchToScale : MonoBehaviour
 
         }
 
+        // Move
+        //if (Input.touchCount == 1 && SelectAxis.selectedAxis > -1 && SelectAxis.selectedAxis < 3)
+        //{
+        //    var touch = Input.GetTouch(0);
+
+        //    if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+        //    {
+        //        totalDistance = 0;
+        //        return;
+        //    }
+
+        //    if (touch.phase == TouchPhase.Began)
+        //    {
+        //        initialPosition = touch.position;
+        //    }
+        //    else
+        //    {
+        //        var distance = initialPosition.x - touch.position.x;
+
+        //        totalDistance = distance;
+        //        text.text = totalDistance.ToString();
+        //    }
+        //}
     }
 }
