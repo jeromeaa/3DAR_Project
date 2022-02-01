@@ -11,10 +11,10 @@ public class PinchToScale : MonoBehaviour
 
     // Slide to move
     Vector2 initialPosition;
-    float totalDistance = 0;
+    Vector3 initialPtPos;
 
     GameObject childMover;
-    // Update is called once per frame
+    float scaleMove = 3000;
 
     private void Start()
     {
@@ -70,27 +70,31 @@ public class PinchToScale : MonoBehaviour
         }
 
         // Move
-        //if (Input.touchCount == 1 && SelectAxis.selectedAxis > -1 && SelectAxis.selectedAxis < 3)
-        //{
-        //    var touch = Input.GetTouch(0);
+        if (Input.touchCount == 1 && SelectAxis.selectedAxis > -1 && SelectAxis.selectedAxis < 3)
+        {
+            var touch = Input.GetTouch(0);
 
-        //    if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
-        //    {
-        //        totalDistance = 0;
-        //        return;
-        //    }
+            if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
+            {
+                return;
+            }
 
-        //    if (touch.phase == TouchPhase.Began)
-        //    {
-        //        initialPosition = touch.position;
-        //    }
-        //    else
-        //    {
-        //        var distance = initialPosition.x - touch.position.x;
-
-        //        totalDistance = distance;
-        //        text.text = totalDistance.ToString();
-        //    }
-        //}
+            if (touch.phase == TouchPhase.Began)
+            {
+                initialPosition = touch.position;
+                initialPtPos = transform.GetChild(0).localPosition;
+            }
+            else
+            {
+                var distance = initialPosition.x - touch.position.x;
+                Vector3 a = initialPtPos;
+                a[SelectAxis.selectedAxis] += -distance / scaleMove/transform.localScale[SelectAxis.selectedAxis];
+                if (a[SelectAxis.selectedAxis] * transform.localScale[SelectAxis.selectedAxis] > 0.3f)
+                    a[SelectAxis.selectedAxis] = 0.2f;
+                if (a[SelectAxis.selectedAxis] * transform.localScale[SelectAxis.selectedAxis] <-0.3f)
+                    a[SelectAxis.selectedAxis] = -0.2f;
+                transform.GetChild(0).localPosition = a;
+            }
+        }
     }
 }

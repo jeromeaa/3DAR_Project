@@ -99,6 +99,7 @@ public class DataPlotter : MonoBehaviour
                     pt.tag = "Scale" + prevScale[i].ToString();
                     pt.GetComponent<Renderer>().material = axisMaterials[i];
 
+
                     TextMeshPro txt = Instantiate(sampleText);
                     txt.transform.parent = pt.transform;
                     txt.transform.localPosition = Vector3.zero;
@@ -283,10 +284,15 @@ public class DataPlotter : MonoBehaviour
                 pt.tag = "Scale1";
                 pt.GetComponent<Renderer>().material = axisMaterials[i];
 
-                TextMeshPro txt = Instantiate(sampleText, posP, Quaternion.identity);
-                txt.text = (pSize * j).ToString();
-                txt.transform.localScale = 0.004f * Vector3.one;
+                Vector3 variation = -2*Vector3.one;
+                variation[i] = 0;
+
+                TextMeshPro txt = Instantiate(sampleText);
                 txt.transform.parent = pt.transform;
+                txt.transform.localPosition = variation;
+                txt.transform.localRotation = Quaternion.identity;
+                txt.transform.localScale = Vector3.one;
+                txt.text = (pSize * j).ToString();
             }
         }
     }
