@@ -65,25 +65,25 @@ public class ChangeText : MonoBehaviour
 
     public void X_next_string(VirtualButtonBehaviour vb)
     {
-        message_X.text = columnList[nX % columnList.Count];
-        nX = nX + 1;
+        nX = (nX + 1)%columnList.Count;
+        message_X.text = columnList[nX];
         
     }
     public void Y_next_string(VirtualButtonBehaviour vb)
     {
-        message_Y.text = columnList[nY % columnList.Count];
-        nY = nY + 1;
+        nY = (nY + 1) % columnList.Count;
+        message_Y.text = columnList[nY];
     }
     public void Z_next_string(VirtualButtonBehaviour vb)
     {
-        message_Z.text = columnList[nZ % columnList.Count];
-        nZ = nZ + 1;
+        nZ = (nZ + 1)% columnList.Count;
+        message_Z.text = columnList[nZ];
     }
     public void data_next_string(VirtualButtonBehaviour vb)
     {
-        message_data.text = dataset_list[ndata % dataset_list.Count];
+        ndata = (ndata + 1)%dataset_list.Count;
+        message_data.text = dataset_list[ndata];
 
-        ndata = ndata + 1;
         inputFil = message_data.text;
         pointList = CSVReader.Read(inputFil);
         columnList = new List<string>(pointList[1].Keys);

@@ -89,6 +89,7 @@ public class DataPlotter : MonoBehaviour
         if(activator == true)
         {
             activator = false;
+            EmptyPlot();
             PlotScatter();
             SelectAxis.fillAxis = true;
         }
