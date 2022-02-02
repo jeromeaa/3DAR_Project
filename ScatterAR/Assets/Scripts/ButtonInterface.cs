@@ -55,7 +55,7 @@ public class ButtonInterface : MonoBehaviour
         }
         selectScript.enabled = !selectScript.enabled;
         selectButton.interactable = !selectButton.interactable;
-        resetButton.interactable = !resetButton.interactable;
+        //resetButton.interactable = !resetButton.interactable;
         cross.enabled = !cross.enabled;
     }
 

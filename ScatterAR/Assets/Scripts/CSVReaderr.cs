@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 // Code parses a CSV, converting values into ints or floats if able, and returning a List<Dictionary<string, object>>.
 
-public class CSVReader
+public class CSVReaderr
 {
     static string SPLIT_RE = @",(?=(?:[^""]*""[^""]*"")*(?![^""]*""))"; // Define delimiters, regular expression craziness
     static string LINE_SPLIT_RE = @"\r\n|\n\r|\n|\r"; // Define line delimiters, regular experession craziness
@@ -31,28 +31,6 @@ public class CSVReader
 
         var header = Regex.Split(lines[0], SPLIT_RE); //Split header (element 0)
 
-        var keepColumn = new bool[header.Length];
-
-        for (var i = 0; i < header.Length; i++)
-        {
-            if(header[i].Length > 0) {
-                keepColumn[i] = true;
-            } else {
-                keepColumn[i] = false;
-            }
-        }
-
-        var firstRow = Regex.Split(lines[1], SPLIT_RE);
-
-        for (var i = 0; i < firstRow.Length; i++) {
-            string value = firstRow[i];
-            value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", "");
-            int n;
-            float m;
-
-            keepColumn[i] = (int.TryParse(value, out n) || float.TryParse(value, out m)) && keepColumn[i];
-        }
-
         // Loops through lines
         for (var i = 1; i < lines.Length; i++)
         {
@@ -65,8 +43,6 @@ public class CSVReader
             // Loops through every value
             for (var j = 0; j < header.Length && j < values.Length; j++)
             {
-                if (!keepColumn[j]) continue;
-
                 string value = values[j]; // Set local variable value
                 value = value.TrimStart(TRIM_CHARS).TrimEnd(TRIM_CHARS).Replace("\\", ""); // Trim characters
                 object finalvalue = value; //set final value

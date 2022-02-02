@@ -66,6 +66,18 @@ public class DataPlotter : MonoBehaviour
         PlotScatter();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            EmptyPlot();
+        }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            PlotScatter();
+        }
+    }
     private void FixedUpdate()
     {
         for (int i = 0; i < 3; i++)
@@ -200,10 +212,10 @@ public class DataPlotter : MonoBehaviour
         mMin[2] = FindMinValue(zName);
 
 
-        pointHolder.transform.parent.transform.position = (plotScale / 2) * Vector3.one;
+        pointHolder.transform.parent.transform.localPosition = (plotScale / 2) * Vector3.one;
 
         limiterCube.transform.localScale = plotScale*1.01f * Vector3.one;
-        limiterCube.transform.position = (plotScale*1.01f / 2) * Vector3.one;
+        limiterCube.transform.localPosition = (plotScale*1.01f / 2) * Vector3.one;
 
         //Loop through Pointlist
         for (var i = 0; i < pointList.Count; i++)
@@ -223,12 +235,12 @@ public class DataPlotter : MonoBehaviour
 
             // Instantiate as gameobject variable so that it can be manipulated within loop
             GameObject dataPoint = Instantiate(
-                    pointPrefab,
-                    new Vector3(x, y, z) * plotScale,
-                    Quaternion.identity);
+                    pointPrefab);
 
             // Make child of PointHolder object, to keep points within container in hierarchy
             dataPoint.transform.parent = pointHolder.transform;
+            dataPoint.transform.localPosition = new Vector3(x, y, z) * plotScale - Vector3.one*(plotScale/2);
+            dataPoint.transform.rotation = Quaternion.identity;
 
             // Assigns original values to dataPointName
             string dataPointName =
@@ -256,8 +268,10 @@ public class DataPlotter : MonoBehaviour
             Vector3 colliderScale = 4 * Vector3.one;
             colliderScale[i] = 1;
 
-            xyzaxis[i] = Instantiate(axisPrefab, pos, Quaternion.identity);
+            xyzaxis[i] = Instantiate(axisPrefab);
             xyzaxis[i].transform.parent = fixedHolder.transform;
+            xyzaxis[i].transform.localPosition = pos;
+            xyzaxis[i].transform.rotation = Quaternion.identity;
             xyzaxis[i].transform.localScale = sc;
             xyzaxis[i].transform.name = mName[i];
             xyzaxis[i].GetComponent<Renderer>().material = axisMaterials[i];
@@ -269,17 +283,19 @@ public class DataPlotter : MonoBehaviour
 
             Vector3 holderPos = Vector3.zero;
             holderPos[i] = plotScale / 2;
-            axisHolder[i].transform.parent.transform.position = holderPos;
+            axisHolder[i].transform.parent.transform.localPosition = holderPos;
 
             // Intermedial values
             float pSize = (mMax[i] - mMin[i]) / numParts;
             for (int j = 0; j < numParts + 1; j++)
             {
                 Vector3 posP = Vector3.zero;
-                posP[i] = (plotScale / numParts) * j;
-                GameObject pt = Instantiate(axisPrefab, posP, Quaternion.identity);
-                pt.transform.localScale = 0.004f * Vector3.one;
+                posP[i] = (plotScale / numParts) * j - (plotScale / 2);
+                GameObject pt = Instantiate(axisPrefab);
                 pt.transform.parent = axisHolder[i].transform;
+                pt.transform.localPosition = posP ;
+                pt.transform.rotation = Quaternion.identity;
+                pt.transform.localScale = 0.004f * Vector3.one;
                 pt.transform.name = (pSize * j).ToString();
                 pt.tag = "Scale1";
                 pt.GetComponent<Renderer>().material = axisMaterials[i];
@@ -295,5 +311,18 @@ public class DataPlotter : MonoBehaviour
                 txt.text = (pSize * j).ToString();
             }
         }
+    }
+
+    private void EmptyPlot()
+    {
+        foreach (Transform pt in pointHolder.transform)
+            Destroy(pt.gameObject);
+        for (int i=0; i < 3; i++)
+        {
+            foreach (Transform axisPt in axisHolder[i].transform)
+                Destroy(axisPt.gameObject);
+        }
+        foreach (Transform axis in fixedHolder.transform)
+            Destroy(axis.gameObject);
     }
 }

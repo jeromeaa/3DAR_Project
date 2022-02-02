@@ -88,12 +88,13 @@ public class PinchToScale : MonoBehaviour
             {
                 var distance = initialPosition.x - touch.position.x;
                 Vector3 a = initialPtPos;
-                a[SelectAxis.selectedAxis] += -distance / scaleMove/transform.localScale[SelectAxis.selectedAxis];
-                if (a[SelectAxis.selectedAxis] * transform.localScale[SelectAxis.selectedAxis] > 0.3f)
+                a[SelectAxis.selectedAxis] += -distance / scaleMove / transform.localScale[SelectAxis.selectedAxis];
+                if (a[SelectAxis.selectedAxis]> 0.2f)
                     a[SelectAxis.selectedAxis] = 0.2f;
-                if (a[SelectAxis.selectedAxis] * transform.localScale[SelectAxis.selectedAxis] <-0.3f)
+                if (a[SelectAxis.selectedAxis] < -0.2f)
                     a[SelectAxis.selectedAxis] = -0.2f;
                 transform.GetChild(0).localPosition = a;
+
             }
         }
     }
