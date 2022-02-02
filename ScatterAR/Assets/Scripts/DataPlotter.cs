@@ -253,7 +253,7 @@ public class DataPlotter : MonoBehaviour
             Vector3 sc = 0.002f * Vector3.one;
             sc[i] = plotScale * 1.1f;
 
-            Vector3 colliderScale = 3 * Vector3.one;
+            Vector3 colliderScale = 4 * Vector3.one;
             colliderScale[i] = 1;
 
             xyzaxis[i] = Instantiate(axisPrefab, pos, Quaternion.identity);

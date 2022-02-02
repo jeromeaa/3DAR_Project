@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -3665999313869630718}
   - component: {fileID: -1169104044480700769}
   - component: {fileID: -3312019754184418995}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: DataSphere
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -19,50 +19,86 @@ public class SelectAxis : MonoBehaviour
     public Button rayCastBtn;
     
     string[] tagList=  {"X","Y","Z"};
-    Color savedColor;
+    Color[] savedColors = new Color[3];
+    int hoveredAxis;
 
     void Start()
     {
-        rayCastBtn.onClick.AddListener(ShootRay);
+        rayCastBtn.onClick.AddListener(ClickShot);
         for (int i = 0; i < 3; i++)
         {
             Axis[i] = fixedAxis.transform.GetChild(i).gameObject;
+            savedColors[i] = mat[i].color;
         }
 
     }
 
-
-
-    public void ChangeAxis(int a)
+    private void Update()
     {
-        if (a != selectedAxis)
-        {
-            if (selectedAxis != 3)
-            {
-                AxisPoints[selectedAxis].GetComponent<PinchToScale>().enabled = false;
-                Axis[selectedAxis].GetComponent<Outline>().enabled = false;
+        ShootRay(true);
+    }
 
-                mat[selectedAxis].color = savedColor;
+    public void ChangeAxis(int a, bool hover)
+    {
+        int prev;
+        if (hover)
+            prev = hoveredAxis;
+        else prev = selectedAxis;
+
+        if (a != prev)
+        {
+            if (prev != 3)
+            {
+                if (!hover)
+                {
+                    AxisPoints[prev].GetComponent<PinchToScale>().enabled = false;
+                    mat[prev].color = savedColors[prev];
+                }
+
+                if (hoveredAxis != selectedAxis)
+                {
+                    Axis[prev].GetComponent<Outline>().enabled = false;
+                    for (int i = 0; i < AxisPoints[prev].transform.GetChild(0).childCount; i++)
+                    {
+                        AxisPoints[prev].transform.GetChild(0).transform.GetChild(i).GetComponent<Outline>().enabled = false;
+                    }
+                }
+
             }
 
             if (a != 3)
             {
+                if (!hover)
+                {
                 AxisPoints[a].GetComponent<PinchToScale>().enabled = true;
-                Axis[a].GetComponent<Outline>().enabled = true;
-                savedColor = mat[a].color;
                 mat[a].color = mat[3].color;
-            }
+                }
 
-            selectedAxis = a;
+                Axis[a].GetComponent<Outline>().enabled = true;
+
+                for (int i = 0; i < AxisPoints[a].transform.GetChild(0).childCount; i++)
+                {
+                    AxisPoints[a].transform.GetChild(0).transform.GetChild(i).GetComponent<Outline>().enabled = true;
+                }
+
+            }
+            if (hover)
+                hoveredAxis = a;
+            else selectedAxis = a;
         }
     }
 
-    private void ShootRay()
+    void ClickShot()
+    {
+        ShootRay(false);
+    }
+
+    private void ShootRay(bool hover)
     {
         Ray ray = Camera.main.ScreenPointToRay(crosshair.transform.position);
         RaycastHit hit;
 
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity,~LayerMask.GetMask("Limiter")))
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity,~(LayerMask.GetMask("Limiter")|LayerMask.GetMask("Point"))))
         {
             var tag = hit.transform.gameObject.tag;
             Debug.Log(tag);
@@ -71,16 +107,16 @@ public class SelectAxis : MonoBehaviour
             Debug.Log(val);
             if (val !=-1)
             {
-                ChangeAxis(val);
+                ChangeAxis(val,hover);
             }
             else
             {
-                ChangeAxis(3);
+                ChangeAxis(3,hover);
             }
         }
         else
         {
-            ChangeAxis(3);
+            ChangeAxis(3,hover);
         }
     }
 
