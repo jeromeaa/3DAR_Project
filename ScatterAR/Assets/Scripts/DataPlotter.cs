@@ -5,11 +5,13 @@ using System;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using Vuforia;
+using UnityEngine.Events;
 
 public class DataPlotter : MonoBehaviour
 {
     // Name of the input file, no extension
-    public string inputFile;
+    public static string inputFile;
 
     public float plotScale = 10;
 
@@ -17,9 +19,9 @@ public class DataPlotter : MonoBehaviour
     private List<Dictionary<string, object>> pointList;
 
     // Indices for columns to be assigned
-    public int columnX = 0;
-    public int columnY = 1;
-    public int columnZ = 2;
+    public static int columnX;
+    public static int columnY;
+    public static int columnZ;
 
     string xName;
     string yName;
@@ -49,6 +51,8 @@ public class DataPlotter : MonoBehaviour
 
     public GameObject Camera;
 
+    public Button menuButton;
+
     // The 3 axis
     GameObject[] xyzaxis = new GameObject[3];
 
@@ -56,28 +60,40 @@ public class DataPlotter : MonoBehaviour
     float[] mMax = new float[3];
     float[] mMin = new float[3];
 
-    int[] prevScale = new int[3] { 1, 1, 1 };
+    int[] prevScale = new int[3];
 
     string[] tagList = { "X", "Y", "Z" };
+
+    public static bool activator=false;
+
 
     // Use this for initialization
     void Start()
     {
-        PlotScatter();
+        columnX = 0;
+        columnY = 1;
+        columnZ = 2;
+        inputFile = "iris";
+        //PlotScatter();
+        
+        menuButton.onClick.AddListener(EmptyPlot);
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
-        {
             EmptyPlot();
-        }
-
         if (Input.GetKeyDown(KeyCode.R))
-        {
             PlotScatter();
+
+        if(activator == true)
+        {
+            activator = false;
+            PlotScatter();
+            SelectAxis.fillAxis = true;
         }
     }
+
     private void FixedUpdate()
     {
         for (int i = 0; i < 3; i++)
@@ -180,6 +196,8 @@ public class DataPlotter : MonoBehaviour
 
     private void PlotScatter()
     {
+        prevScale = new int[]{ 1, 1, 1 };
+        numParts = 4;
         // Set pointlist to results of function Reader with argument inputfile
         pointList = CSVReader.Read(inputFile);
 
@@ -271,7 +289,7 @@ public class DataPlotter : MonoBehaviour
             xyzaxis[i] = Instantiate(axisPrefab);
             xyzaxis[i].transform.parent = fixedHolder.transform;
             xyzaxis[i].transform.localPosition = pos;
-            xyzaxis[i].transform.rotation = Quaternion.identity;
+            xyzaxis[i].transform.localRotation = Quaternion.identity;
             xyzaxis[i].transform.localScale = sc;
             xyzaxis[i].transform.name = mName[i];
             xyzaxis[i].GetComponent<Renderer>().material = axisMaterials[i];
@@ -325,4 +343,5 @@ public class DataPlotter : MonoBehaviour
         foreach (Transform axis in fixedHolder.transform)
             Destroy(axis.gameObject);
     }
+
 }

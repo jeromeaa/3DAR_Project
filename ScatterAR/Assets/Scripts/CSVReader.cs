@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 // Taken from here: https://bravenewmethod.com/2014/09/13/lightweight-csv-reader-for-unity/
 // Comments
@@ -50,7 +51,7 @@ public class CSVReader
             int n;
             float m;
 
-            keepColumn[i] = (int.TryParse(value, out n) || float.TryParse(value, out m)) && keepColumn[i];
+            keepColumn[i] = (int.TryParse(value, out n) || float.TryParse(value, NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out m)) && keepColumn[i];
         }
 
         // Loops through lines

@@ -22,6 +22,8 @@ public class SelectAxis : MonoBehaviour
     Color[] savedColors = new Color[3];
     int hoveredAxis;
 
+    public static bool fillAxis = false;
+
     void Start()
     {
         rayCastBtn.onClick.AddListener(ClickShot);
@@ -36,8 +38,21 @@ public class SelectAxis : MonoBehaviour
     private void Update()
     {
         ShootRay(true);
+
+        if (fillAxis)
+        {
+            fillAxis = false;
+            fillAxisArray();
+        }
     }
 
+    void fillAxisArray()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            Axis[i] = fixedAxis.transform.GetChild(i).gameObject;
+        }
+    }
     public void ChangeAxis(int a, bool hover)
     {
         int prev;

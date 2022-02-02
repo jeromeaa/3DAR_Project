@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using Vuforia;
 
 public class ButtonInterface : MonoBehaviour
 {
@@ -11,12 +12,17 @@ public class ButtonInterface : MonoBehaviour
     public Button crossButton;
     public Button selectButton;
 
+    public VirtualButtonBehaviour[] vbtn;
+
     public TextMeshProUGUI cross;
 
     public Transform[] scalers;
 
     //Cross
     public SelectAxis selectScript;
+
+    public GameObject menu;
+    public GameObject ui;
 
     void Start()
     {
@@ -61,7 +67,13 @@ public class ButtonInterface : MonoBehaviour
 
     void ShowHideMenu()
     {
+        if (selectScript.enabled)
+            OnOffCross();
+        for (int i = 0; i < 5; i++)
+            vbtn[i].enabled = true;
 
+        menu.SetActive(true);
+        ui.SetActive(false);
     }
 
 
